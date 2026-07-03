@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>&#44260;&#52649; &#51060;&#49345;&#54805; &#50900;&#46300;&#52981;</title>
+  <style>
+    *{box-sizing:border-box}
+    body{font-family:Arial,sans-serif;background:#f2f7ef;color:#172018;margin:0}
+    .wrap{max-width:1100px;margin:0 auto;padding:22px}
+    header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+    h1{font-size:28px;margin:0}
+    button{border:0;border-radius:8px;background:#256f3a;color:#fff;font-weight:bold;padding:11px 16px;cursor:pointer}
+    button:hover{background:#1d5a2e}
+    .status{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
+    .pill{background:#fff;border:1px solid #d7e4d0;border-radius:999px;padding:8px 12px;font-weight:bold;color:#33513c}
+    .arena{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .card{background:#fff;border:1px solid #dce8d5;border-radius:12px;padding:18px;box-shadow:0 8px 22px rgba(25,60,30,.14);cursor:pointer;transition:transform .15s,box-shadow .15s}
+    .card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(25,60,30,.22)}
+    .art{height:270px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#f9fcf6,#edf7ea);border-radius:10px;margin-bottom:14px;overflow:hidden}
+    .art svg{width:min(88%,320px);height:min(88%,240px)}
+    .name{text-align:center;font-size:26px;font-weight:bold}
+    .hint{text-align:center;color:#57705e;margin-top:8px}
+    .winner{background:#fff;border-radius:12px;padding:24px;text-align:center;box-shadow:0 8px 22px rgba(25,60,30,.14)}
+    .winner .art{max-width:520px;margin:0 auto 18px}
+    .winner .name{font-size:34px;margin-bottom:16px}
+    @media(max-width:720px){
+      .arena{grid-template-columns:1fr}
+      .art{height:220px}
+      .name{font-size:22px}
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <h1>&#44260;&#52649; &#51060;&#49345;&#54805; &#50900;&#46300;&#52981; 32&#44053;</h1>
+      <button onclick="restart()">&#45796;&#49884; &#49884;&#51089;</button>
+    </header>
+    <section class="status">
+      <div id="round" class="pill"></div>
+      <div id="match" class="pill"></div>
+    </section>
+    <section id="game"></section>
+  </main>
+  <script>
+    const insects=[
+      ['\uC7A5\uC218\uD48D\uB385\uC774','beetle','#4b2e1f'],['\uC0AC\uC2B4\uBC8C\uB808','stag','#2f241d'],['\uB098\uBE44','butterfly','#ef7c8e'],['\uBC8C','bee','#f2b705'],
+      ['\uC7A0\uC790\uB9AC','dragonfly','#2b8bd6'],['\uBB34\uB2F9\uBC8C\uB808','ladybug','#df2f2f'],['\uB9E4\uBBF8','cicada','#6f8f44'],['\uC0AC\uB9C8\uADC0','mantis','#57a64a'],
+      ['\uBA54\uB69C\uAE30','grasshopper','#5f9e32'],['\uADC0\uB69C\uB77C\uBBF8','cricket','#3b3b2f'],['\uBC18\uB527\uBD88\uC774','firefly','#759f30'],['\uAC1C\uBBF8','ant','#513126'],
+      ['\uD558\uB298\uC18C','longhorn','#28405c'],['\uBB3C\uBC29\uAC1C','beetle','#1f4f72'],['\uAC8C\uC544\uC7AC\uBE44','bug','#6b4b32'],['\uB178\uB9B0\uC7AC','bug','#7c8a38'],
+      ['\uC1E0\uB625\uAD6C\uB9AC','beetle','#2f302c'],['\uBC14\uAD6C\uBBF8','beetle','#79553d'],['\uC9D1\uAC8C\uBC8C\uB808','earwig','#6a3f2a'],['\uD558\uB8E8\uC0B4\uC774','dragonfly','#9ecae1'],
+      ['\uC18C\uAE08\uC7C1\uC774','bug','#466d8a'],['\uC1A1\uC7A5\uBC8C\uB808','beetle','#101010'],['\uD770\uAC1C\uBBF8','ant','#d7c7a2'],['\uC655\uD30C\uB9AC','fly','#5d6875'],
+      ['\uB4F1\uC5D0','fly','#69727d'],['\uBAA8\uAE30','mosquito','#4f5964'],['\uD30C\uB9AC','fly','#35506f'],['\uBCBC\uB8E9','bug','#654231'],
+      ['\uC774','bug','#7a6956'],['\uBC14\uD034\uBC8C\uB808','roach','#6a3d21'],['\uB098\uBC29','butterfly','#a78b5f'],['\uAF43\uB4F1\uC5D0','bee','#e28743']
+    ].map(([name,type,color])=>({name,type,color}));
+
+    let players=[],winners=[],roundSize=32,index=0,champion=null;
+    const game=document.getElementById('game');
+    const roundEl=document.getElementById('round');
+    const matchEl=document.getElementById('match');
+
+    function shuffle(list){
+      return [...list].sort(()=>Math.random()-.5);
+    }
+
+    function insectSvg(item){
+      const color=item.color;
+      const wing=['butterfly','dragonfly','fly','bee','mosquito'].includes(item.type);
+      const horns=item.type==='stag'||item.type==='longhorn';
+      const stripes=item.type==='bee';
+      const spots=item.type==='ladybug';
+      return `<svg viewBox="0 0 320 240" role="img" aria-label="${item.name}">
+        <ellipse cx="160" cy="204" rx="82" ry="14" fill="rgba(0,0,0,.13)"/>
+        ${wing?`<ellipse cx="104" cy="94" rx="58" ry="36" fill="rgba(190,225,255,.78)" stroke="#8ab3ce" stroke-width="3" transform="rotate(-28 104 94)"/>
+        <ellipse cx="216" cy="94" rx="58" ry="36" fill="rgba(190,225,255,.78)" stroke="#8ab3ce" stroke-width="3" transform="rotate(28 216 94)"/>`:''}
+        <line x1="92" y1="142" x2="42" y2="112" stroke="#2f2f2f" stroke-width="7" stroke-linecap="round"/>
+        <line x1="98" y1="162" x2="40" y2="170" stroke="#2f2f2f" stroke-width="7" stroke-linecap="round"/>
+        <line x1="228" y1="142" x2="278" y2="112" stroke="#2f2f2f" stroke-width="7" stroke-linecap="round"/>
+        <line x1="222" y1="162" x2="280" y2="170" stroke="#2f2f2f" stroke-width="7" stroke-linecap="round"/>
+        <ellipse cx="160" cy="144" rx="54" ry="70" fill="${color}" stroke="#202820" stroke-width="5"/>
+        <circle cx="160" cy="72" r="34" fill="${color}" stroke="#202820" stroke-width="5"/>
+        ${stripes?'<rect x="115" y="124" width="90" height="14" fill="#241b12"/><rect x="112" y="154" width="96" height="14" fill="#241b12"/>':''}
+        ${spots?'<circle cx="134" cy="132" r="11" fill="#111"/><circle cx="184" cy="132" r="11" fill="#111"/><circle cx="158" cy="166" r="12" fill="#111"/>':''}
+        <circle cx="148" cy="66" r="5" fill="#111"/><circle cx="172" cy="66" r="5" fill="#111"/>
+        <line x1="146" y1="40" x2="118" y2="18" stroke="#202820" stroke-width="5" stroke-linecap="round"/>
+        <line x1="174" y1="40" x2="202" y2="18" stroke="#202820" stroke-width="5" stroke-linecap="round"/>
+        ${horns?'<path d="M135 48 C112 28,102 22,88 20 M185 48 C208 28,218 22,232 20" fill="none" stroke="#202820" stroke-width="8" stroke-linecap="round"/>':''}
+        <path d="M132 98 C148 112,172 112,188 98" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="8" stroke-linecap="round"/>
+      </svg>`;
+    }
+
+    function card(item,side){
+      return `<article class="card" onclick="choose(${side})">
+        <div class="art">${insectSvg(item)}</div>
+        <div class="name">${item.name}</div>
+        <div class="hint">\uC120\uD0DD\uD558\uAE30</div>
+      </article>`;
+    }
+
+    function render(){
+      if(champion){
+        roundEl.textContent='\uC6B0\uC2B9';
+        matchEl.textContent='\uCD5C\uC885 \uACB0\uACFC';
+        game.innerHTML=`<section class="winner"><div class="art">${insectSvg(champion)}</div><div class="name">${champion.name}</div><button onclick="restart()">\uB2E4\uC2DC \uD558\uAE30</button></section>`;
+        return;
+      }
+      const a=players[index],b=players[index+1];
+      roundEl.textContent=roundSize===2?'\uACB0\uC2B9':`${roundSize}\uAC15`;
+      matchEl.textContent=`${Math.floor(index/2)+1} / ${roundSize/2}`;
+      game.innerHTML=`<div class="arena">${card(a,0)}${card(b,1)}</div>`;
+    }
+
+    function choose(side){
+      winners.push(players[index+side]);
+      index+=2;
+      if(index>=players.length){
+        if(winners.length===1){
+          champion=winners[0];
+        }else{
+          players=winners;
+          winners=[];
+          roundSize=players.length;
+          index=0;
+        }
+      }
+      render();
+    }
+
+    function restart(){
+      players=shuffle(insects);
+      winners=[];
+      roundSize=32;
+      index=0;
+      champion=null;
+      render();
+    }
+
+    restart();
+  </script>
+</body>
+</html>
