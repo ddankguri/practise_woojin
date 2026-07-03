@@ -2,18 +2,26 @@
 <html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>&#47196;&#46608; &#52628;&#52392;&#44592; V3</title>
 <style>
-body{font-family:Arial,sans-serif;background:#eef3f8;margin:0}
+:root{--bg:#eef3f8;--text:#172033;--card:#fff;--shadow:rgba(0,0,0,.15);--primary:#2d7ef7;--primaryText:#fff;--muted:#516070}
+body.dark{--bg:#111827;--text:#f3f4f6;--card:#1f2937;--shadow:rgba(0,0,0,.45);--primary:#60a5fa;--primaryText:#0f172a;--muted:#cbd5e1}
+body{font-family:Arial,sans-serif;background:var(--bg);color:var(--text);margin:0;transition:background .2s,color .2s}
 .wrap{max-width:900px;margin:30px auto;padding:20px}
 h1{text-align:center}
-.controls{text-align:center;margin:20px}
-button{padding:10px 18px;margin:5px;border:none;border-radius:8px;background:#2d7ef7;color:#fff;cursor:pointer}
-.card{background:#fff;border-radius:12px;padding:15px;margin:12px 0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.controls,.theme{text-align:center;margin:20px}
+button{padding:10px 18px;margin:5px;border:none;border-radius:8px;background:var(--primary);color:var(--primaryText);cursor:pointer}
+button.mode{background:var(--card);color:var(--text);border:1px solid var(--muted)}
+button.mode.active{background:var(--primary);color:var(--primaryText);border-color:var(--primary)}
+.card{background:var(--card);border-radius:12px;padding:15px;margin:12px 0;box-shadow:0 2px 8px var(--shadow)}
 .ball{display:inline-flex;justify-content:center;align-items:center;width:48px;height:48px;border-radius:50%;margin:4px;color:#fff;font-weight:bold}
 .y{background:#f5c400}.b{background:#2f80ed}.r{background:#eb5757}.g{background:#888}.gr{background:#27ae60}
 .lock{float:right}
 </style></head><body>
 <div class="wrap">
 <h1>&#47196;&#46608; &#52628;&#52392;&#44592; V3</h1>
+<div class="theme">
+<button id="lightMode" class="mode" onclick="setTheme('light')">&#54868;&#51060;&#53944; &#47784;&#46300;</button>
+<button id="darkMode" class="mode" onclick="setTheme('dark')">&#45796;&#53356; &#47784;&#46300;</button>
+</div>
 <div class="controls">
 <button onclick="draw(false)">&#52376;&#51020; &#49373;&#49457;</button>
 <button onclick="draw(true)">&#45796;&#49884; &#52628;&#52392;</button>
@@ -24,6 +32,12 @@ button{padding:10px 18px;margin:5px;border:none;border-radius:8px;background:#2d
 <script>
 let data=[null,null,null,null,null];
 let locked=[false,false,false,false,false];
+function setTheme(theme){
+ document.body.classList.toggle('dark',theme==='dark');
+ document.getElementById('lightMode').classList.toggle('active',theme==='light');
+ document.getElementById('darkMode').classList.toggle('active',theme==='dark');
+ localStorage.setItem('theme',theme);
+}
 function cls(n){if(n<=10)return'y';if(n<=20)return'b';if(n<=30)return'r';if(n<=40)return'g';return'gr';}
 function make(){let a=[];while(a.length<6){let n=Math.floor(Math.random()*45)+1;if(!a.includes(n))a.push(n)}return a.sort((x,y)=>x-y)}
 function render(){
@@ -51,5 +65,6 @@ function copyNums(){
  navigator.clipboard.writeText(t);
  alert('\uBC88\uD638\uAC00 \uBCF5\uC0AC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.');
 }
+setTheme(localStorage.getItem('theme')||'light');
 draw(false);
 </script></body></html>
