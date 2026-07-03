@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>로또 추첨기 V3</title>
+<style>
+body{font-family:Arial,sans-serif;background:#eef3f8;margin:0}
+.wrap{max-width:900px;margin:30px auto;padding:20px}
+h1{text-align:center}
+.controls{text-align:center;margin:20px}
+button{padding:10px 18px;margin:5px;border:none;border-radius:8px;background:#2d7ef7;color:#fff;cursor:pointer}
+.card{background:#fff;border-radius:12px;padding:15px;margin:12px 0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.ball{display:inline-flex;justify-content:center;align-items:center;width:48px;height:48px;border-radius:50%;margin:4px;color:#fff;font-weight:bold}
+.y{background:#f5c400}.b{background:#2f80ed}.r{background:#eb5757}.g{background:#888}.gr{background:#27ae60}
+.lock{float:right}
+</style></head><body>
+<div class="wrap">
+<h1>🎲 로또 추첨기 V3</h1>
+<div class="controls">
+<button onclick="draw(false)">🎲 처음 생성</button>
+<button onclick="draw(true)">🔄 다시 추첨</button>
+<button onclick="copyNums()">📋 번호 복사</button>
+</div>
+<div id="games"></div>
+</div>
+<script>
+let data=[null,null,null,null,null];
+let locked=[false,false,false,false,false];
+function cls(n){if(n<=10)return'y';if(n<=20)return'b';if(n<=30)return'r';if(n<=40)return'g';return'gr';}
+function make(){let a=[];while(a.length<6){let n=Math.floor(Math.random()*45)+1;if(!a.includes(n))a.push(n)}return a.sort((x,y)=>x-y)}
+function render(){
+ let h='';
+ data.forEach((g,i)=>{
+ h+=`<div class="card"><b>${i+1}게임</b>
+ <label class="lock"><input type="checkbox" ${locked[i]?'checked':''} onchange="locked[${i}]=this.checked"> 🔒고정</label><br><br>`;
+ g.forEach(n=>h+=`<span class="ball ${cls(n)}">${n}</span>`);
+ h+='</div>';
+ });
+ document.getElementById('games').innerHTML=h;
+}
+function draw(re){
+ let area=document.getElementById('games');
+ area.innerHTML='<p style="text-align:center;font-size:20px">🎱 추첨중...</p>';
+ setTimeout(()=>{
+   for(let i=0;i<5;i++){
+      if(!re||!locked[i]) data[i]=make();
+   }
+   render();
+ },600);
+}
+function copyNums(){
+ let t=data.map((g,i)=>`${i+1}게임 : ${g.join(', ')}`).join('\n');
+ navigator.clipboard.writeText(t);
+ alert('번호가 복사되었습니다.');
+}
+draw(false);
+</script></body></html>
