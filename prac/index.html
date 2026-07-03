@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>로또 추첨기 V3</title>
+<title>&#47196;&#46608; &#52628;&#52392;&#44592; V3</title>
 <style>
 body{font-family:Arial,sans-serif;background:#eef3f8;margin:0}
 .wrap{max-width:900px;margin:30px auto;padding:20px}
@@ -13,11 +13,11 @@ button{padding:10px 18px;margin:5px;border:none;border-radius:8px;background:#2d
 .lock{float:right}
 </style></head><body>
 <div class="wrap">
-<h1>🎲 로또 추첨기 V3</h1>
+<h1>&#47196;&#46608; &#52628;&#52392;&#44592; V3</h1>
 <div class="controls">
-<button onclick="draw(false)">🎲 처음 생성</button>
-<button onclick="draw(true)">🔄 다시 추첨</button>
-<button onclick="copyNums()">📋 번호 복사</button>
+<button onclick="draw(false)">&#52376;&#51020; &#49373;&#49457;</button>
+<button onclick="draw(true)">&#45796;&#49884; &#52628;&#52392;</button>
+<button onclick="copyNums()">&#48264;&#54840; &#48373;&#49324;</button>
 </div>
 <div id="games"></div>
 </div>
@@ -29,8 +29,8 @@ function make(){let a=[];while(a.length<6){let n=Math.floor(Math.random()*45)+1;
 function render(){
  let h='';
  data.forEach((g,i)=>{
- h+=`<div class="card"><b>${i+1}게임</b>
- <label class="lock"><input type="checkbox" ${locked[i]?'checked':''} onchange="locked[${i}]=this.checked"> 🔒고정</label><br><br>`;
+ h+=`<div class="card"><b>${i+1}\uAC8C\uC784</b>
+ <label class="lock"><input type="checkbox" ${locked[i]?'checked':''} onchange="locked[${i}]=this.checked"> \uACE0\uC815</label><br><br>`;
  g.forEach(n=>h+=`<span class="ball ${cls(n)}">${n}</span>`);
  h+='</div>';
  });
@@ -38,7 +38,7 @@ function render(){
 }
 function draw(re){
  let area=document.getElementById('games');
- area.innerHTML='<p style="text-align:center;font-size:20px">🎱 추첨중...</p>';
+ area.innerHTML='<p style="text-align:center;font-size:20px">\uCD94\uCCA8 \uC911...</p>';
  setTimeout(()=>{
    for(let i=0;i<5;i++){
       if(!re||!locked[i]) data[i]=make();
@@ -47,9 +47,9 @@ function draw(re){
  },600);
 }
 function copyNums(){
- let t=data.map((g,i)=>`${i+1}게임 : ${g.join(', ')}`).join('\n');
+ let t=data.map((g,i)=>`${i+1}\uAC8C\uC784 : ${g.join(', ')}`).join('\n');
  navigator.clipboard.writeText(t);
- alert('번호가 복사되었습니다.');
+ alert('\uBC88\uD638\uAC00 \uBCF5\uC0AC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.');
 }
 draw(false);
 </script></body></html>
