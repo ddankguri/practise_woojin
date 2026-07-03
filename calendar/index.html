@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>&#45804;&#47141; &#47564;&#46308;&#44592;</title>
+  <style>
+    *{box-sizing:border-box}
+    body{font-family:Arial,sans-serif;background:#f4f7fb;color:#172033;margin:0}
+    .wrap{max-width:880px;margin:32px auto;padding:20px}
+    h1{text-align:center;margin:0 0 24px}
+    .panel{display:flex;gap:10px;justify-content:center;align-items:end;flex-wrap:wrap;background:#fff;border-radius:12px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+    label{display:flex;flex-direction:column;gap:6px;font-weight:bold;color:#344054}
+    input{width:130px;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px}
+    button{padding:11px 18px;border:0;border-radius:8px;background:#2563eb;color:#fff;font-size:16px;font-weight:bold;cursor:pointer}
+    button:hover{background:#1d4ed8}
+    .calendar{margin-top:24px;background:#fff;border-radius:12px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+    .title{text-align:center;font-size:24px;font-weight:bold;margin:4px 0 18px}
+    .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+    .day-name,.day{min-height:58px;display:flex;align-items:center;justify-content:center;border-radius:8px}
+    .day-name{min-height:36px;background:#e8eef8;font-weight:bold;color:#475467}
+    .day{background:#f8fafc;border:1px solid #e2e8f0;font-size:18px}
+    .empty{background:transparent;border-color:transparent}
+    .sun{color:#dc2626}
+    .sat{color:#2563eb}
+    .today{background:#dbeafe;border-color:#2563eb;font-weight:bold}
+    .message{text-align:center;color:#dc2626;font-weight:bold;margin-top:14px;min-height:22px}
+    @media(max-width:560px){
+      .wrap{margin:18px auto;padding:14px}
+      input{width:100%}
+      label{width:calc(50% - 6px)}
+      button{width:100%}
+      .day{min-height:46px;font-size:16px}
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>&#45804;&#47141; &#47564;&#46308;&#44592;</h1>
+    <section class="panel">
+      <label>
+        &#50672;&#46020;
+        <input id="year" type="number" min="1900" max="9999" placeholder="2026">
+      </label>
+      <label>
+        &#50900;
+        <input id="month" type="number" min="1" max="12" placeholder="7">
+      </label>
+      <button onclick="makeCalendar()">&#45804;&#47141; &#48372;&#44592;</button>
+    </section>
+    <p id="message" class="message"></p>
+    <section id="calendar" class="calendar"></section>
+  </main>
+  <script>
+    const yearInput=document.getElementById('year');
+    const monthInput=document.getElementById('month');
+    const message=document.getElementById('message');
+    const calendar=document.getElementById('calendar');
+    const now=new Date();
+
+    yearInput.value=now.getFullYear();
+    monthInput.value=now.getMonth()+1;
+
+    function makeCalendar(){
+      const year=Number(yearInput.value);
+      const month=Number(monthInput.value);
+      message.textContent='';
+
+      if(!Number.isInteger(year)||year<1900||year>9999||!Number.isInteger(month)||month<1||month>12){
+        calendar.innerHTML='';
+        message.textContent='\uC5F0\uB3C4\uB294 1900~9999, \uC6D4\uC740 1~12 \uC0AC\uC774\uB85C \uC785\uB825\uD574 \uC8FC\uC138\uC694.';
+        return;
+      }
+
+      const firstDay=new Date(year,month-1,1).getDay();
+      const lastDate=new Date(year,month,0).getDate();
+      const dayNames=['\uC77C','\uC6D4','\uD654','\uC218','\uBAA9','\uAE08','\uD1A0'];
+      let html=`<div class="title">${year}\uB144 ${month}\uC6D4</div><div class="grid">`;
+
+      dayNames.forEach((name,index)=>{
+        const cls=index===0?' sun':index===6?' sat':'';
+        html+=`<div class="day-name${cls}">${name}</div>`;
+      });
+
+      for(let i=0;i<firstDay;i++) html+='<div class="day empty"></div>';
+
+      for(let date=1;date<=lastDate;date++){
+        const day=new Date(year,month-1,date).getDay();
+        const isToday=year===now.getFullYear()&&month===now.getMonth()+1&&date===now.getDate();
+        const cls=[day===0?'sun':'',day===6?'sat':'',isToday?'today':''].filter(Boolean).join(' ');
+        html+=`<div class="day ${cls}">${date}</div>`;
+      }
+
+      html+='</div>';
+      calendar.innerHTML=html;
+    }
+
+    yearInput.addEventListener('keydown',event=>{if(event.key==='Enter')makeCalendar();});
+    monthInput.addEventListener('keydown',event=>{if(event.key==='Enter')makeCalendar();});
+    makeCalendar();
+  </script>
+</body>
+</html>
