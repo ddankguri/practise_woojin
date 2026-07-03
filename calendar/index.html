@@ -56,6 +56,8 @@
     const calendar=document.getElementById('calendar');
     const now=new Date();
     let currentDays=[];
+    let currentYear=now.getFullYear();
+    let currentMonth=now.getMonth()+1;
 
     yearInput.value=now.getFullYear();
     monthInput.value=now.getMonth()+1;
@@ -75,6 +77,8 @@
       const dayNames=['\uC77C','\uC6D4','\uD654','\uC218','\uBAA9','\uAE08','\uD1A0'];
       let html=`<div class="title">${year}\uB144 ${month}\uC6D4</div><div class="line">`;
       currentDays=[];
+      currentYear=year;
+      currentMonth=month;
 
       for(let date=1;date<=lastDate;date++){
         const day=new Date(year,month-1,date).getDay();
@@ -87,7 +91,7 @@
       calendar.innerHTML=html;
     }
 
-    function copyCalendar(){
+    async function copyCalendar(){
       if(currentDays.length===0){
         message.textContent='\uBA3C\uC800 \uB2EC\uB825\uC744 \uB9CC\uB4E4\uC5B4 \uC8FC\uC138\uC694.';
         return;
@@ -95,7 +99,22 @@
 
       const dates=currentDays.map(day=>day.date).join('\t');
       const weekdays=currentDays.map(day=>day.weekday).join('\t');
-      navigator.clipboard.writeText(`${dates}\n${weekdays}`);
+      const title=`${currentYear}\uB144 ${currentMonth}\uC6D4`;
+      const plain=`${title}\n${dates}\n${weekdays}`;
+      const dateCells=currentDays.map(day=>`<td style="text-align:center;border:1px solid #999;">${day.date}</td>`).join('');
+      const weekdayCells=currentDays.map(day=>`<td style="text-align:center;border:1px solid #999;">${day.weekday}</td>`).join('');
+      const table=`<table><tr><td colspan="${currentDays.length}" style="text-align:center;font-weight:bold;border:1px solid #999;">${title}</td></tr><tr>${dateCells}</tr><tr>${weekdayCells}</tr></table>`;
+
+      if(navigator.clipboard&&window.ClipboardItem){
+        const item=new ClipboardItem({
+          'text/html':new Blob([table],{type:'text/html'}),
+          'text/plain':new Blob([plain],{type:'text/plain'})
+        });
+        await navigator.clipboard.write([item]);
+      }else{
+        await navigator.clipboard.writeText(plain);
+      }
+
       message.textContent='\uC5D1\uC140\uC5D0 \uBD99\uC5EC\uB123\uC744 \uC218 \uC788\uAC8C \uBCF5\uC0AC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.';
     }
 
