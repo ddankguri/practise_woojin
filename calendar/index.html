@@ -44,6 +44,7 @@
         <input id="month" type="number" min="1" max="12" placeholder="7">
       </label>
       <button onclick="makeCalendar()">&#45804;&#47141; &#48372;&#44592;</button>
+      <button onclick="copyCalendar()">&#48373;&#49324;&#54616;&#44592;</button>
     </section>
     <p id="message" class="message"></p>
     <section id="calendar" class="calendar"></section>
@@ -54,6 +55,7 @@
     const message=document.getElementById('message');
     const calendar=document.getElementById('calendar');
     const now=new Date();
+    let currentDays=[];
 
     yearInput.value=now.getFullYear();
     monthInput.value=now.getMonth()+1;
@@ -72,15 +74,29 @@
       const lastDate=new Date(year,month,0).getDate();
       const dayNames=['\uC77C','\uC6D4','\uD654','\uC218','\uBAA9','\uAE08','\uD1A0'];
       let html=`<div class="title">${year}\uB144 ${month}\uC6D4</div><div class="line">`;
+      currentDays=[];
 
       for(let date=1;date<=lastDate;date++){
         const day=new Date(year,month-1,date).getDay();
         const cls=day===0?'sun':day===6?'sat':'';
+        currentDays.push({date,weekday:dayNames[day]});
         html+=`<div class="day ${cls}"><strong>${date}</strong><span class="weekday">${dayNames[day]}</span></div>`;
       }
 
       html+='</div>';
       calendar.innerHTML=html;
+    }
+
+    function copyCalendar(){
+      if(currentDays.length===0){
+        message.textContent='\uBA3C\uC800 \uB2EC\uB825\uC744 \uB9CC\uB4E4\uC5B4 \uC8FC\uC138\uC694.';
+        return;
+      }
+
+      const dates=currentDays.map(day=>day.date).join('\t');
+      const weekdays=currentDays.map(day=>day.weekday).join('\t');
+      navigator.clipboard.writeText(`${dates}\n${weekdays}`);
+      message.textContent='\uC5D1\uC140\uC5D0 \uBD99\uC5EC\uB123\uC744 \uC218 \uC788\uAC8C \uBCF5\uC0AC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.';
     }
 
     yearInput.addEventListener('keydown',event=>{if(event.key==='Enter')makeCalendar();});
