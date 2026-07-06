@@ -27,12 +27,14 @@ button.mode.active{background:var(--primary);color:var(--primaryText);border-col
 <div class="controls">
 <button onclick="draw(false)">&#52376;&#51020; &#49373;&#49457;</button>
 <button onclick="draw(true)">&#45796;&#49884; &#52628;&#52392;</button>
+<button onclick="drawBonus()">&#48372;&#45320;&#49828; &#48264;&#54840; &#52628;&#52392;</button>
 <button onclick="copyNums()">&#48264;&#54840; &#48373;&#49324;</button>
 </div>
 <div id="games"></div>
 </div>
 <script>
 let data=[null,null,null,null,null];
+let bonus=[null,null,null,null,null];
 let locked=[false,false,false,false,false];
 function setTheme(theme){
  document.body.classList.toggle('dark',theme==='dark');
@@ -47,7 +49,14 @@ function render(){
  data.forEach((g,i)=>{
  h+=`<div class="card"><b>${i+1}\uAC8C\uC784</b>
  <label class="lock"><input type="checkbox" ${locked[i]?'checked':''} onchange="locked[${i}]=this.checked"> \uACE0\uC815</label><br><br>`;
- g.forEach(n=>h+=`<span class="ball ${cls(n)}">${n}</span>`);
+ if(g){
+  g.forEach(n=>h+=`<span class="ball ${cls(n)}">${n}</span>`);
+  if(bonus[i]!==null){
+   h+=`<span style="font-size:24px;font-weight:bold;margin:0 10px;vertical-align:middle;">+</span>`;
+   h+=`<span class="ball ${cls(bonus[i])}">${bonus[i]}</span>`;
+   h+=`<span style="font-size:14px;font-weight:bold;color:var(--muted);vertical-align:middle;margin-left:4px;">\uBCF4\uB108\uC2A4</span>`;
+  }
+ }
  h+='</div>';
  });
  document.getElementById('games').innerHTML=h;
@@ -57,13 +66,34 @@ function draw(re){
  area.innerHTML='<p style="text-align:center;font-size:20px">\uCD94\uCCA8 \uC911...</p>';
  setTimeout(()=>{
    for(let i=0;i<5;i++){
-      if(!re||!locked[i]) data[i]=make();
+      if(!re||!locked[i]) {
+        data[i]=make();
+        bonus[i]=null;
+      }
    }
    render();
  },600);
 }
+function drawBonus(){
+ for(let i=0;i<5;i++){
+  if(data[i]&&(!locked[i]||bonus[i]===null)){
+   let b;
+   do{
+    b=Math.floor(Math.random()*45)+1;
+   }while(data[i].includes(b));
+   bonus[i]=b;
+  }
+ }
+ render();
+}
 function copyNums(){
- let t=data.map((g,i)=>`${i+1}\uAC8C\uC784 : ${g.join(', ')}`).join('\n');
+ let t=data.map((g,i)=>{
+  let txt=`${i+1}\uAC8C\uC784 : ${g.join(', ')}`;
+  if(bonus[i]!==null){
+   txt+=` + \uBCF4\uB108\uC2A4: ${bonus[i]}`;
+  }
+  return txt;
+ }).join('\n');
  navigator.clipboard.writeText(t);
  alert('\uBC88\uD638\uAC00 \uBCF5\uC0AC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.');
 }
